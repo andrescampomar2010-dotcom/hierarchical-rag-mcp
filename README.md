@@ -1,3 +1,11 @@
+# Hierarchical RAG + MCP Assistant
+
+[![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org) [![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com) [![License: MIT](https://img.shields.io/badge/license-MIT-2563eb?style=flat-square)](LICENSE)
+
+> **EN**: Conversational assistant in Spanish that answers from a hierarchical RAG over PDFs and, when needed, calls external tools exposed via MCP (SSE). Two Docker Compose services, ChromaDB + SQLite, Streamlit UI, pytest suite and full per-request decision traces. It never answers without a citation or a tool call.
+
+---
+
 ## Asistente RAG jerárquico + MCP
 
 Asistente conversacional **en español** que responde preguntas apoyándose en un
