@@ -29,9 +29,11 @@ _TOOL_KEYWORDS = (
 SYSTEM_PROMPT = """Eres un enrutador de un asistente. Decides cómo responder cada pregunta.
 
 Opciones de ruta:
-- RAG: la respuesta está en la documentación interna en PDF (manuales, procedimientos, normativa, cifras de los documentos).
+- RAG: la respuesta está en la documentación interna en PDF (manuales,
+  procedimientos, normativa, cifras de los documentos).
 - TOOL: la respuesta requiere datos en vivo que aportan las herramientas externas disponibles.
-- BOTH: hace falta combinar un dato del PDF con una herramienta (p. ej. tomar una cifra del PDF y convertirla de divisa).
+- BOTH: hace falta combinar un dato del PDF con una herramienta (p. ej.
+  tomar una cifra del PDF y convertirla de divisa).
 - NONE: la pregunta no se puede responder ni con el PDF ni con las herramientas.
 
 Responde SOLO con un objeto JSON válido con esta forma exacta:
@@ -49,12 +51,22 @@ def _heuristic_route(query: str, tool_names: list[str]) -> RouteDecision:
     """Fallback por reglas cuando el LLM no está disponible."""
     q = query.lower()
     mentions_tool = any(kw in q for kw in _TOOL_KEYWORDS) and bool(tool_names)
-    mentions_convert = any(w in q for w in ("convierte", "convertir", "conversión", "a dólares", "a usd"))
+    mentions_convert = any(
+        w in q for w in ("convierte", "convertir", "conversión", "a dólares", "a usd")
+    )
     if mentions_convert and tool_names:
-        return RouteDecision("BOTH", "Heurística: conversión que combina cifra del PDF y una tool.", "heuristica")
+        return RouteDecision(
+            "BOTH", "Heurística: conversión que combina cifra del PDF y una tool.", "heuristica"
+        )
     if mentions_tool:
-        return RouteDecision("TOOL", "Heurística: la pregunta menciona datos en vivo (divisas/mercados).", "heuristica")
-    return RouteDecision("RAG", "Heurística: por defecto se consulta la documentación en PDF.", "heuristica")
+        return RouteDecision(
+            "TOOL",
+            "Heurística: la pregunta menciona datos en vivo (divisas/mercados).",
+            "heuristica",
+        )
+    return RouteDecision(
+        "RAG", "Heurística: por defecto se consulta la documentación en PDF.", "heuristica"
+    )
 
 
 def classify(query: str, tools: list[Any], *,
@@ -82,7 +94,9 @@ def classify(query: str, tools: list[Any], *,
         if route in VALID_ROUTES:
             # Si el LLM elige TOOL/BOTH pero no hay tools, degradamos a RAG.
             if route in ("TOOL", "BOTH") and not tool_names:
-                return RouteDecision("RAG", "No hay herramientas MCP disponibles; se usa solo RAG.", "llm")
+                return RouteDecision(
+                    "RAG", "No hay herramientas MCP disponibles; se usa solo RAG.", "llm"
+                )
             decision = RouteDecision(route, reason, "llm")
             log.info("Ruta elegida por LLM: %s (%s)", route, reason)
             return decision

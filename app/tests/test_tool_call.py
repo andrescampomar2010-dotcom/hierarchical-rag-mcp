@@ -2,17 +2,17 @@
 from __future__ import annotations
 
 import datetime as dt
-import sys
 import os
+import sys
 
 # Para tests locales, intenta cargar mcp_server si está disponible
 _root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if _root not in sys.path:
     sys.path.insert(0, _root)
 
-import pytest
+import pytest  # noqa: E402
 
-from app import mcp_client
+from app import mcp_client  # noqa: E402
 
 # Intenta importar las tools locales; si no está disponible, se saltarán esos tests
 try:

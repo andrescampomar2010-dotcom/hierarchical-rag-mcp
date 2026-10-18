@@ -35,7 +35,7 @@ _TOOL_CACHE_TTL = 3600
 @dataclass
 class ToolSpec:
     """Especificación de una herramienta MCP.
-    
+
     Attributes:
         name: Identificador único de la herramienta
         description: Descripción legible de qué hace
@@ -47,7 +47,7 @@ class ToolSpec:
 
     def to_openai_tool(self) -> dict[str, Any]:
         """Convierte la tool al formato de function-calling de OpenAI.
-        
+
         Returns:
             Diccionario en formato OpenAI Function Call
         """
@@ -64,7 +64,7 @@ class ToolSpec:
 @dataclass
 class ToolResult:
     """Resultado de ejecutar una herramienta MCP.
-    
+
     Attributes:
         name: Nombre de la herramienta ejecutada
         ok: True si ejecutó correctamente
@@ -81,15 +81,15 @@ class ToolResult:
 
 def _run(coro: asyncio.coroutine) -> Any:
     """Ejecuta una corrutina en un hilo con su propio event loop.
-    
+
     Necesario porque Streamlit es síncrono pero MCP client es async.
-    
+
     Args:
         coro: Corrutina para ejecutar
-        
+
     Returns:
         Resultado de la corrutina
-        
+
     Raises:
         Exception: Si la corrutina falla
     """
@@ -190,19 +190,19 @@ def _is_cache_valid() -> bool:
 
 def discover_tools(*, force: bool = False) -> list[ToolSpec]:
     """Descubre las tools del servidor MCP con TTL cache.
-    
+
     El resultado se cachea por 1 hora para evitar llamadas frecuentes.
-    
+
     Args:
         force: Si True, ignora el cache y redescubre las tools
-        
+
     Returns:
         Lista de herramientas disponibles en el servidor MCP
-        
+
     Example:
         tools = discover_tools()
         tool_names = [t.name for t in tools]
-        
+
     Note:
         Si el servidor no está disponible, devuelve el ultimo resultado
         en cache o lista vacía si nunca se conectó.
@@ -224,20 +224,20 @@ def discover_tools(*, force: bool = False) -> list[ToolSpec]:
 
 def call_tool(name: str, arguments: dict[str, Any]) -> ToolResult:
     """Invoca una tool MCP con timeout y reintentos automáticos.
-    
+
     Implementa robustez con:
     - Timeout configurable por llamada
     - Reintentos con backoff exponencial
     - Manejo de errores de conexión
     - Logging detallado de cada intento
-    
+
     Args:
         name: Nombre de la herramienta a invocar
         arguments: Argumentos en formato dict (se pasan como JSON)
-        
+
     Returns:
         ToolResult con resultado o error detallado
-        
+
     Example:
         result = call_tool("fx_rate", {"base": "EUR", "quote": "USD"})
         if result.ok:
@@ -274,7 +274,7 @@ def call_tool(name: str, arguments: dict[str, Any]) -> ToolResult:
 
 def server_health() -> dict[str, Any]:
     """Consulta el endpoint /health del servidor MCP.
-    
+
     Returns:
         {"ok": True, "data": {...}} si el servidor responde
         {"ok": False, "error": "..."} si hay error de conexión

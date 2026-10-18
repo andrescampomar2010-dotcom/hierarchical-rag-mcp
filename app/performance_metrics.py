@@ -16,7 +16,7 @@ from typing import Any
 @dataclass
 class QueryMetrics:
     """Métricas de una consulta individual.
-    
+
     Attributes:
         query: Texto de la consulta
         route: Ruta elegida (RAG/TOOL/BOTH/NONE)
@@ -40,7 +40,7 @@ class QueryMetrics:
 @dataclass
 class SystemMetrics:
     """Estadísticas globales del sistema.
-    
+
     Attributes:
         total_queries: Número total de consultas procesadas
         total_duration_ms: Tiempo total de todas las consultas
@@ -62,24 +62,24 @@ class SystemMetrics:
     tool_calls_count: int = 0
     last_query_duration_ms: float = 0.0
     startup_time: float = field(default_factory=time.time)
-    
+
     @property
     def avg_duration_ms(self) -> float:
         """Tiempo promedio por consulta."""
         if self.total_queries == 0:
             return 0.0
         return self.total_duration_ms / self.total_queries
-    
+
     @property
     def most_common_route(self) -> str:
         """Ruta más utilizada."""
         return max(self.queries_by_route.items(), key=lambda x: x[1])[0]
-    
+
     @property
     def uptime_seconds(self) -> float:
         """Tiempo desde el inicio del sistema en segundos."""
         return time.time() - self.startup_time
-    
+
     def to_dict(self) -> dict[str, Any]:
         """Convierte a diccionario para serialización JSON."""
         return {
@@ -99,15 +99,15 @@ class SystemMetrics:
 
 class MetricsCollector:
     """Recopila y agrega métricas del sistema."""
-    
+
     def __init__(self):
         self.metrics = SystemMetrics()
         self.query_history: list[QueryMetrics] = []
         self._max_history = 100  # Guardar últimas 100 queries
-    
+
     def record_query(self, query_metric: QueryMetrics) -> None:
         """Registra una consulta completada.
-        
+
         Args:
             query_metric: Métricas de la consulta
         """
@@ -119,22 +119,22 @@ class MetricsCollector:
         self.metrics.embeddings_count += query_metric.embeddings_used
         self.metrics.chunks_retrieved_count += query_metric.chunks_retrieved
         self.metrics.tool_calls_count += query_metric.tool_calls
-        
+
         # Guardar en historial (circular)
         self.query_history.append(query_metric)
         if len(self.query_history) > self._max_history:
             self.query_history.pop(0)
-    
+
     def get_metrics(self) -> SystemMetrics:
         """Devuelve las métricas globales actuales."""
         return self.metrics
-    
+
     def get_query_history(self, limit: int = 20) -> list[dict[str, Any]]:
         """Devuelve el historial de consultas más recientes.
-        
+
         Args:
             limit: Número máximo de consultas a retornar
-            
+
         Returns:
             Lista de últimas N consultas como dicts
         """
@@ -151,7 +151,7 @@ class MetricsCollector:
             }
             for q in reversed(recent)
         ]
-    
+
     def reset(self) -> None:
         """Reinicia todas las métricas."""
         self.metrics = SystemMetrics()

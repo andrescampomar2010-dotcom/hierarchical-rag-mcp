@@ -15,7 +15,7 @@ class ValidationError(ValueError):
 
 class FileValidationResult(NamedTuple):
     """Resultado de validación de archivo.
-    
+
     Attributes:
         valid: True si el archivo pasa todas las validaciones
         error: Mensaje de error si valid=False
@@ -36,44 +36,47 @@ PDF_HEADER = b"%PDF-"
 
 def validate_pdf_file(file_bytes: bytes, filename: str) -> FileValidationResult:
     """Valida un archivo PDF antes de procesarlo.
-    
+
     Verificaciones:
     - Nombre de archivo válido (no vacío, sin caracteres peligrosos)
     - Tamaño dentro de límites (100 bytes - 50 MB)
     - Header PDF válido (%PDF-)
     - Extensión .pdf
-    
+
     Args:
         file_bytes: Contenido del archivo en bytes
         filename: Nombre del archivo
-        
+
     Returns:
         FileValidationResult con resultado de validación
-        
+
     Example:
         result = validate_pdf_file(file_contents, "document.pdf")
         if not result.valid:
             show_error(f"Archivo inválido: {result.error}")
     """
     size_bytes = len(file_bytes)
-    
+
     # Validar nombre
     if not filename or not isinstance(filename, str):
         return FileValidationResult(valid=False, error="Nombre de archivo inválido")
-    
+
     filename_clean = filename.strip()
     if not filename_clean:
         return FileValidationResult(valid=False, error="Nombre de archivo no puede estar vacío")
-    
+
     # Validar extensión
     if not filename_clean.lower().endswith(".pdf"):
         return FileValidationResult(
             valid=False,
-            error=f"Archivo debe ser PDF. Recibido: {os.path.splitext(filename_clean)[1] or '(sin extensión)'}",
+            error=(
+                f"Archivo debe ser PDF. Recibido: "
+                f"{os.path.splitext(filename_clean)[1] or '(sin extensión)'}"
+            ),
             size_bytes=size_bytes,
             is_pdf=False
         )
-    
+
     # Validar caracteres peligrosos en nombre
     dangerous_chars = ["\\", "/", ":", "*", "?", '"', "<", ">", "|", "\0"]
     for char in dangerous_chars:
@@ -84,16 +87,19 @@ def validate_pdf_file(file_bytes: bytes, filename: str) -> FileValidationResult:
                 size_bytes=size_bytes,
                 is_pdf=False
             )
-    
+
     # Validar tamaño mínimo
     if size_bytes < MIN_PDF_SIZE_BYTES:
         return FileValidationResult(
             valid=False,
-            error=f"Archivo demasiado pequeño ({size_bytes} bytes). Mínimo: {MIN_PDF_SIZE_BYTES} bytes",
+            error=(
+                f"Archivo demasiado pequeño ({size_bytes} bytes). "
+                f"Mínimo: {MIN_PDF_SIZE_BYTES} bytes"
+            ),
             size_bytes=size_bytes,
             is_pdf=False
         )
-    
+
     # Validar tamaño máximo
     max_size_bytes = MAX_PDF_SIZE_MB * 1024 * 1024
     if size_bytes > max_size_bytes:
@@ -104,7 +110,7 @@ def validate_pdf_file(file_bytes: bytes, filename: str) -> FileValidationResult:
             size_bytes=size_bytes,
             is_pdf=False
         )
-    
+
     # Validar header PDF
     if not file_bytes.startswith(PDF_HEADER):
         return FileValidationResult(
@@ -113,7 +119,7 @@ def validate_pdf_file(file_bytes: bytes, filename: str) -> FileValidationResult:
             size_bytes=size_bytes,
             is_pdf=False
         )
-    
+
     return FileValidationResult(
         valid=True,
         error="",

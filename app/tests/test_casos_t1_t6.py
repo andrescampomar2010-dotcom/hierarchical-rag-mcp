@@ -10,13 +10,10 @@ Para ejecutar: pytest app/tests/test_casos_t1_t6.py -v
 """
 from __future__ import annotations
 
-import pytest
-
 from app import router
 from app.chunking import chunk_document
 from app.pdf_ingest import extract_pages
 from app.rag import build_context_text
-
 
 # ─────────────────────────────────────────────────────────────────────────
 # Helpers
@@ -133,7 +130,9 @@ def test_t5_teletrabajo_japon_no_en_pdf(sample_pdf):
     """T5: 'política de teletrabajo en Japón' no debe aparecer en ningún chunk."""
     pages = extract_pages(sample_pdf)
     doc = chunk_document(pages, "manual_ejemplo.pdf")
-    chunks_japon = [c for c in doc.children if "japón" in c.text.lower() or "japan" in c.text.lower()]
+    chunks_japon = [
+        c for c in doc.children if "japón" in c.text.lower() or "japan" in c.text.lower()
+    ]
     assert not chunks_japon, "El PDF no debe contener información sobre teletrabajo en Japón"
 
 

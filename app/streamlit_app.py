@@ -92,11 +92,11 @@ def accion_guardar_pdfs(uploaded_files) -> None:
         # Validar archivo antes de procesarlo
         file_bytes = file.getbuffer().tobytes()
         validation = validate_pdf_file(file_bytes, file.name)
-        
+
         if not validation.valid:
             flash("error", f"❌ {file.name}: {validation.error}")
             continue
-        
+
         try:
             dest = os.path.join(settings.pdf_dir, file.name)
             with open(dest, "wb") as fh:
